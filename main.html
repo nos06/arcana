@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcana: Handshake Error - AEP Simulator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #0d1117; /* GitHub Dark Mode 배경색 */
+            color: #c9d1d9; /* 텍스트 색상 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #161b22; /* 컨테이너 배경색 */
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 30px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h1 {
+            color: #58a6ff; /* 제목 색상 */
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        .section-title {
+            color: #79c0ff; /* 섹션 제목 색상 */
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            border-bottom: 1px dashed #30363d;
+            padding-bottom: 5px;
+        }
+
+        textarea, input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            border-radius: 5px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9em;
+            resize: vertical;
+            min-height: 100px;
+            outline: none;
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            border-color: #58a6ff;
+            box-shadow: 0 0 5px rgba(88, 166, 255, 0.5);
+        }
+
+        button {
+            background-color: #238636; /* 실행 버튼 색상 */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #2ea043;
+        }
+
+        button:disabled {
+            background-color: #30363d;
+            cursor: not-allowed;
+        }
+
+        .terminal {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 5px;
+            padding: 15px;
+            height: 180px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 0.85em;
+            color: #79c0ff; /* 터미널 출력 색상 */
+            line-height: 1.4;
+        }
+
+        .log-error {
+            color: #f85149; /* 에러 메시지 색상 */
+        }
+        .log-success {
+            color: #3fb950; /* 성공 메시지 색상 */
+        }
+        .log-warn {
+            color: #d29922; /* 경고 메시지 색상 */
+        }
+
+        .entropy-gauge-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .entropy-gauge-bar {
+            flex-grow: 1;
+            height: 20px;
+            background-color: #30363d;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .entropy-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #3fb950, #d29922, #f85149); /* 녹색 -> 주황색 -> 빨간색 */
+            transition: width 0.5s ease-out;
+            border-radius: 10px;
+            transform-origin: left;
+        }
+
+        .entropy-label {
+            font-weight: bold;
+            color: #79c0ff;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .entropy-debt-status {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #f85149; /* 위험 상태 색상 */
+            font-weight: bold;
+            display: none; /* 초기에는 숨김 */
+        }
+
+        /* 애니메이션 효과 */
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        .glitch {
+            animation: glitch 0.1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Arcana: Handshake Error - AEP 시뮬레이터</h1>
+
+        <div class="section-title">주문(Spell) 입력</div>
+        <textarea id="spellInput" placeholder="예시: CAST FIREBALL (target: 'air', fuel: 'dust');&#10;HEAL (target: 'self', tissue: 'muscle');&#10;TELEPORT (destination: 'Sector 7');"></textarea>
+        
+        <button id="executeButton">아르카나 실행</button>
+
+        <div class="section-title">AMB 서버 터미널</div>
+        <div class="terminal" id="terminalOutput">
+            > AMB 네트워크 접속...
+        </div>
+
+        <div class="section-title">엔트로피 부채 (Entropy Debt)</div>
+        <div class="entropy-gauge-container">
+            <span class="entropy-label">ΔS: <span id="entropyValue">0</span>%</span>
+            <div class="entropy-gauge-bar">
+                <div class="entropy-fill" id="entropyFill"></div>
+            </div>
+        </div>
+        <div class="entropy-debt-status" id="debtStatus">엔트로피 부채가 위험 수준입니다! 열 추징 위험!</div>
+    </div>
+
+    <script>
+        const spellInput = document.getElementById('spellInput');
+        const executeButton = document.getElementById('executeButton');
+        const terminalOutput = document.getElementById('terminalOutput');
+        const entropyValueSpan = document.getElementById('entropyValue');
+        const entropyFill = document.getElementById('entropyFill');
+        const debtStatus = document.getElementById('debtStatus');
+
+        let currentEntropy = 0;
+        const MAX_ENTROPY = 100;
+        const DANGER_THRESHOLD = 70;
+
+        // 터미널에 로그 추가 함수
+        function logToTerminal(message, type = '') {
+            const span = document.createElement('span');
+            span.textContent = `> ${message}\n`;
+            if (type) span.classList.add(`log-${type}`);
+            terminalOutput.appendChild(span);
+            terminalOutput.scrollTop = terminalOutput.scrollHeight; // 스크롤 하단으로
+        }
+
+        // 엔트로피 업데이트 함수
+        function updateEntropy(delta) {
+            currentEntropy = Math.min(MAX_ENTROPY, currentEntropy + delta);
+            entropyValueSpan.textContent = currentEntropy;
+            entropyFill.style.width = `${currentEntropy}%`;
+
+            if (currentEntropy >= DANGER_THRESHOLD) {
+                debtStatus.style.display = 'block';
+                entropyFill.style.background = 'linear-gradient(to right, #d29922, #f85149)';
+                // 위험 수준에서는 게이지바에 글리치 효과 추가
+                if (!entropyFill.classList.contains('glitch')) {
+                    entropyFill.classList.add('glitch');
+                }
+            } else {
+                debtStatus.style.display = 'none';
+                entropyFill.style.background = 'linear-gradient(to right, #3fb950, #d29922)';
+                entropyFill.classList.remove('glitch');
+            }
+        }
+
+        // 초기화
+        updateEntropy(0);
+
+        executeButton.addEventListener('click', async () => {
+            const spell = spellInput.value.trim();
+            if (!spell) {
+                logToTerminal('오류: 주문을 입력해주세요.', 'error');
+                return;
+            }
+
+            executeButton.disabled = true;
+            logToTerminal('TLS 암호화된 주문 전송 중...');
+
+            await new Promise(resolve => setTimeout(resolve, 1500)); // 통신 지연 시뮬레이션
+
+            logToTerminal('AMB 서버 접속 완료. 권한 확인 및 반응 시뮬레이션 시작...');
+
+            await new Promise(resolve => setTimeout(resolve, 2000)); // 시뮬레이션 지연
+
+            let simulationResult = { success: false, entropyGain: 0, message: '' };
+            let isUndocumentedOpcode = false;
+
+            // 간단한 주문 파싱 및 시뮬레이션 로직
+            if (spell.includes('FIREBALL')) {
+                simulationResult.success = true;
+                simulationResult.entropyGain = 25;
+                simulationResult.message = '안전성 예측: "파이어볼" 시술 승인. 고온 산화 반응 유도.';
+            } else if (spell.includes('HEAL')) {
+                simulationResult.success = true;
+                simulationResult.entropyGain = 10;
+                simulationResult.message = '안전성 예측: "힐링" 시술 승인. 생체 재생 촉진.';
+            } else if (spell.includes('TELEPORT')) {
+                simulationResult.success = true;
+                simulationResult.entropyGain = 40;
+                simulationResult.message = '안전성 예측: "텔레포트" 시술 승인. 대규모 공간 이동 에너지 장벽 재설정.';
+            } else if (spell.includes('UNDOCUMENTED_OPCODE')) { // 미공개 오피코드 시뮬레이션
+                simulationResult.success = true;
+                simulationResult.entropyGain = Math.floor(Math.random() * 50) + 30; // 30~80 무작위 엔트로피
+                simulationResult.message = '경고: 미공개 오피코드 탐지! 예측 불가능한 반응 유도!';
+                isUndocumentedOpcode = true;
+            } else {
+                simulationResult.success = false;
+                simulationResult.entropyGain = 5; // 실패해도 약간의 엔트로피는 발생
+                simulationResult.message = '오류: 유효하지 않거나 인식할 수 없는 주문입니다.';
+            }
+
+            if (simulationResult.success) {
+                logToTerminal(simulationResult.message, isUndocumentedOpcode ? 'warn' : 'success');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                logToTerminal('일회성 실행 토큰(E-Grant) 발급...');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                logToTerminal(`E-Seq 바이트코드 마나 필드에 송출 완료. ΔS: +${simulationResult.entropyGain}`, 'success');
+                updateEntropy(simulationResult.entropyGain);
+
+                if (isUndocumentedOpcode) {
+                    logToTerminal('엔트로피 원장 기록 왜곡 시도... (시뮬레이션)', 'warn');
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    logToTerminal('일부 엔트로피 기록이 누락되었습니다. AMB 추적 위험!', 'error');
+                }
+            } else {
+                logToTerminal(simulationResult.message, 'error');
+                updateEntropy(simulationResult.entropyGain);
+            }
+            
+            executeButton.disabled = false;
+        });
+    </script>
+</body>
+</html>
