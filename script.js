@@ -30,41 +30,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 로그인 시스템 기능
     function showLogin() {
-        const loginContainer = document.createElement('div');
-        loginContainer.id = 'login-container';
-        loginContainer.style.cssText = `
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; justify-content: center; align-items: center;
-            background-color: #0d1117; z-index: 100;
-        `;
-        loginContainer.innerHTML = `
-            <div id="login-box" style="
-                border: 2px solid var(--neon-color); padding: 40px;
-                box-shadow: 0 0 20px var(--neon-color); background-color: rgba(13, 17, 23, 0.9);
-                text-align: center;
-            ">
-                <h1 style="color: var(--neon-color); text-shadow: 0 0 5px var(--neon-color);">AMB Login</h1>
-                <p style="color: var(--neon-color);">User ID:</p>
-                <input type="text" id="login-id" placeholder="Enter your ID" style="
-                    background-color: transparent; border: 1px solid var(--neon-color);
-                    color: var(--neon-color); padding: 5px; margin: 10px 0;
-                    font-family: 'Courier New', Courier, monospace; outline: none;
-                ">
-                <button id="login-button" style="
-                    background-color: transparent; border: 1px solid var(--neon-color);
-                    color: var(--neon-color); padding: 8px 15px; cursor: pointer;
-                    font-family: 'Courier New', Courier, monospace;
-                ">Connect</button>
-                <p id="login-status" style="color: var(--neon-color);"></p>
-            </div>
-        `;
-        document.body.appendChild(loginContainer);
+    const loginContainer = document.createElement('div');
+    loginContainer.id = 'login-container';
+    loginContainer.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        display: flex; justify-content: center; align-items: center;
+        background-color: #0d1117; z-index: 100;
+    `;
+    loginContainer.innerHTML = `
+        <div id="login-box">
+            <h1>AMB Login</h1>
+            <p>User ID:</p>
+            <input type="text" id="login-id" placeholder="Enter your ID">
+            <p>Password:</p>
+            <input type="password" id="login-pw" placeholder="Enter your password">
+            <button id="login-button">Connect</button>
+            <p><a href="#" id="signup-link">회원가입</a></p>
+            <p id="login-status"></p>
+        </div>
+    `;
+    document.body.appendChild(loginContainer);
 
-        document.getElementById('login-button').addEventListener('click', handleLogin);
-        document.getElementById('login-id').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') handleLogin();
-        });
-    }
+    document.getElementById('login-button').addEventListener('click', handleLogin);
+    document.getElementById('login-id').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+    document.getElementById('login-pw').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+    document.getElementById('signup-link').addEventListener('click', showSignup);
+}
+
+function showSignup(e) {
+    e.preventDefault();
+    const loginBox = document.getElementById('login-box');
+    loginBox.innerHTML = `
+        <h1>AMB Register</h1>
+        <p>New User ID:</p>
+        <input type="text" id="signup-id" placeholder="Create new ID">
+        <p>Password:</p>
+        <input type="password" id="signup-pw" placeholder="Create password">
+        <p>Request Grade:</p>
+        <select id="signup-grade">
+            <option value="Citizen">Citizen</option>
+            <option value="Technician" disabled>Technician</option>
+        </select>
+        <button id="register-button">Register</button>
+        <p><a href="#" id="login-link">로그인으로 돌아가기</a></p>
+        <p id="signup-status"></p>
+    `;
+    document.getElementById('register-button').addEventListener('click', handleRegister);
+    document.getElementById('login-link').addEventListener('click', () => {
+        document.getElementById('login-box').innerHTML = originalLoginHTML;
+        showLogin();
+    });
+}
 
     function handleLogin() {
         const loginIdInput = document.getElementById('login-id');
