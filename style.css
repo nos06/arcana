@@ -1,6 +1,9 @@
 body {
+    --neon-color: #00ff41;
+    /* JavaScript가 이 변수를 변경합니다 */
     background-color: #0d1117;
     color: var(--neon-color);
+    /* 색상 변수 사용 */
     font-family: 'Courier New', Courier, monospace;
     margin: 0;
     padding: 20px;
@@ -9,7 +12,80 @@ body {
     align-items: center;
     min-height: 100vh;
     box-sizing: border-box;
+}
 
+/* 아래는 기존 스타일에서 #00ff41을 var(--neon-color)로 대체한 부분입니다. */
+.container {
+    display: flex;
+    width: 90%;
+    max-width: 1200px;
+    height: 80vh;
+    border: 2px solid var(--neon-color);
+    box-shadow: 0 0 20px var(--neon-color);
+    background-color: rgba(13, 17, 23, 0.8);
+}
+
+.info-panel {
+    width: 30%;
+    padding: 20px;
+    border-right: 2px solid var(--neon-color);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+h1 {
+    font-size: 1.5em;
+    text-shadow: 0 0 5px var(--neon-color);
+}
+
+.grade-selector select {
+    background-color: #0d1117;
+    color: var(--neon-color);
+    border: 1px solid var(--neon-color);
+    padding: 5px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.debt-bar-container {
+    width: 100%;
+    height: 10px;
+    background-color: #333;
+    border: 1px solid var(--neon-color);
+}
+
+.debt-bar {
+    height: 100%;
+    width: 0%;
+    background-color: var(--neon-color);
+    transition: width 0.5s ease-in-out;
+}
+
+.output {
+    flex-grow: 1;
+    overflow-y: auto;
+    font-size: 0.9em;
+    white-space: pre-wrap;
+}
+
+.input-line {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.prompt {
+    margin-right: 5px;
+    font-size: 1em;
+}
+
+#input {
+    background-color: transparent;
+    border: none;
+    color: var(--neon-color);
+    font-family: 'Courier New', Courier, monospace;
+    width: 100%;
+    outline: none;
 }
 
 .container {
