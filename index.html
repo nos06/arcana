@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,14 +34,28 @@
 
         <div class="terminal-window">
             <div id="output" class="output">
-                </div>
+            </div>
             <div class="input-line">
                 <span class="prompt">></span>
                 <input type="text" id="input" autofocus>
             </div>
         </div>
     </div>
+    <div id="login-container">
+        <div id="login-box">
+            <h1>AMB Login</h1>
+            <p>User ID:</p>
+            <input type="text" id="login-id" placeholder="Enter your ID">
+            <p>Password:</p>
+            <input type="password" id="login-pw" placeholder="Enter your password">
+            <button id="login-button">Connect</button>
+            <p><a href="#" id="signup-link">회원가입</a></p>
+            <p id="login-status"></p>
+        </div>
+    </div>
 
-    <script src="script.js"></script>
+    <script src="script.js">
+    </script>
 </body>
+
 </html>
