@@ -1,3 +1,4 @@
+// 시작
 document.addEventListener('DOMContentLoaded', () => {
     // 네온 색상 변동 기능
     const colorThemes = ['#00ff41', '#ff00ff', '#00ffff', '#ffff00', '#ff8c00'];
@@ -5,106 +6,215 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function changeTheme(color) {
         document.documentElement.style.setProperty('--neon-color', color);
-        const elements = document.querySelectorAll('.container, .info-panel, .info-panel h1, .grade-selector select, .entropy-debt, .debt-bar-container, .debt-bar, .output, .input-line, #input, #login-box');
+        const elements = document.querySelectorAll('#main-container, .info-panel, .info-panel h1, .grade-selector select, .entropy-debt, .debt-bar-container, .debt-bar, .output, .input-line, #input, #login-box, #login-box input, #login-box button, #login-box a');
         elements.forEach(el => {
-            el.style.borderColor = color;
+            if (el.id !== 'debt-bar') {
+                el.style.borderColor = color;
+            }
         });
         document.body.style.color = color;
-        document.querySelector('.container').style.boxShadow = `0 0 20px ${color}`;
-        document.querySelector('.debt-bar').style.backgroundColor = color;
-        const textElements = document.querySelectorAll('p, span, h1, label, button, select, input');
+        const mainContainer = document.querySelector('#main-container');
+        if (mainContainer) {
+            mainContainer.style.boxShadow = `0 0 20px ${color}`;
+        }
+        const debtBar = document.querySelector('.debt-bar');
+        if (debtBar) {
+            debtBar.style.backgroundColor = color;
+        }
+        const textElements = document.querySelectorAll('p, span, h1, label, button, select, input, a');
         textElements.forEach(el => {
             el.style.color = color;
             el.style.textShadow = `0 0 5px ${color}`;
         });
     }
 
-    // 10초마다 자동으로 색상 변경
     setInterval(() => {
         currentColorIndex = (currentColorIndex + 1) % colorThemes.length;
         changeTheme(colorThemes[currentColorIndex]);
     }, 10000);
 
-    // 초기 색상 설정
     changeTheme(colorThemes[0]);
 
     // 로그인 시스템 기능
+    let originalLoginHTML;
+
     function showLogin() {
-    const loginContainer = document.createElement('div');
-    loginContainer.id = 'login-container';
-    loginContainer.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        display: flex; justify-content: center; align-items: center;
-        background-color: #0d1117; z-index: 100;
-    `;
-    loginContainer.innerHTML = `
-        <div id="login-box">
-            <h1>AMB Login</h1>
-            <p>User ID:</p>
-            <input type="text" id="login-id" placeholder="Enter your ID">
-            <p>Password:</p>
-            <input type="password" id="login-pw" placeholder="Enter your password">
-            <button id="login-button">Connect</button>
-            <p><a href="#" id="signup-link">회원가입</a></p>
-            <p id="login-status"></p>
-        </div>
-    `;
-    document.body.appendChild(loginContainer);
+        // 기존 로그인 컨테이너가 있으면 제거
+        const existingLoginContainer = document.getElementById('login-container');
+        if (existingLoginContainer) {
+            existingLoginContainer.remove();
+        }
 
-    document.getElementById('login-button').addEventListener('click', handleLogin);
-    document.getElementById('login-id').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') handleLogin();
-    });
-    document.getElementById('login-pw').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') handleLogin();
-    });
-    document.getElementById('signup-link').addEventListener('click', showSignup);
-}
-
-function showSignup(e) {
-    e.preventDefault();
-    const loginBox = document.getElementById('login-box');
-    loginBox.innerHTML = `
-        <h1>AMB Register</h1>
-        <p>New User ID:</p>
-        <input type="text" id="signup-id" placeholder="Create new ID">
-        <p>Password:</p>
-        <input type="password" id="signup-pw" placeholder="Create password">
-        <p>Request Grade:</p>
-        <select id="signup-grade">
-            <option value="Citizen">Citizen</option>
-            <option value="Technician" disabled>Technician</option>
-        </select>
-        <button id="register-button">Register</button>
-        <p><a href="#" id="login-link">로그인으로 돌아가기</a></p>
-        <p id="signup-status"></p>
-    `;
-    document.getElementById('register-button').addEventListener('click', handleRegister);
-    document.getElementById('login-link').addEventListener('click', () => {
-        document.getElementById('login-box').innerHTML = originalLoginHTML;
-        showLogin();
-    });
-}
-
-    function handleLogin() {
-        const loginIdInput = document.getElementById('login-id');
-        const loginId = loginIdInput.value.trim();
-        const loginStatus = document.getElementById('login-status');
+        const loginContainer = document.createElement('div');
+        loginContainer.id = 'login-container';
+        loginContainer.innerHTML = `
+            <div id="login-box">
+                <h1>AMB Login</h1>
+                <p>User ID:</p>
+                <input type="text" id="login-id" placeholder="Enter your ID">
+                <p>Password:</p>
+                <input type="password" id="login-pw" placeholder="Enter your password">
+                <button id="login-button">Connect</button>
+                <p><a href="#" id="signup-link">회원가입</a></p>
+                <p id="login-status"></p>
+            </div>
+        `;
+        document.body.appendChild(loginContainer);
+        originalLoginHTML = document.getElementById('login-box').innerHTML; // 이 부분이 중요!
         
-        const authorizedUsers = ['Neo', 'Trinity', 'Morpheus'];
+        document.getElementById('login-button').addEventListener('click', handleLogin);
+        document.getElementById('login-id').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
+        document.getElementById('login-pw').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
+        document.getElementById('signup-link').addEventListener('click', showSignup);
+    }
 
-        if (authorizedUsers.includes(loginId)) {
-            document.getElementById('login-container').style.display = 'none';
-            document.getElementById('main-container').style.display = 'flex';
-            document.getElementById('user-id').textContent = `User ID: ${loginId}`;
-            trackUser(loginId);
-            initializeTerminal();
-        } else {
-            loginStatus.textContent = 'ERROR: Invalid User ID.';
-            loginStatus.style.color = '#ff4141';
+    function showSignup(e) {
+        if (e) e.preventDefault();
+        const loginBox = document.getElementById('login-box');
+        loginBox.innerHTML = `
+            <h1>AMB Register</h1>
+            <p>New User ID:</p>
+            <input type="text" id="signup-id" placeholder="Create new ID">
+            <p>Email:</p>
+            <input type="email" id="signup-email" placeholder="Enter your email">
+            <p>Password:</p>
+            <input type="password" id="signup-pw" placeholder="Create password">
+            <p>Request Grade:</p>
+            <select id="signup-grade">
+                <option value="Citizen">Citizen</option>
+                <option value="Technician" disabled>Technician</option>
+            </select>
+            <button id="register-button">Register</button>
+            <p><a href="#" id="login-link">로그인으로 돌아가기</a></p>
+            <p id="signup-status"></p>
+        `;
+        document.getElementById('register-button').addEventListener('click', handleRegister);
+        document.getElementById('login-link').addEventListener('click', (event) => {
+            event.preventDefault();
+            const loginBox = document.getElementById('login-box');
+            loginBox.innerHTML = originalLoginHTML;
+            showLogin();
+        });
+    }
+
+    async function handleRegister() {
+        const id = document.getElementById('signup-id').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const password = document.getElementById('signup-pw').value.trim();
+        const grade = document.getElementById('signup-grade').value;
+        const signupStatus = document.getElementById('signup-status');
+
+        try {
+            const response = await fetch('http://localhost:3000/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, email, password, grade })
+            });
+            const result = await response.json();
+
+            if (response.ok) {
+                signupStatus.textContent = result.message;
+                signupStatus.style.color = 'var(--neon-color)';
+                showVerificationStep(id);
+            } else {
+                signupStatus.textContent = `ERROR: ${result.error}`;
+                signupStatus.style.color = '#ff4141';
+            }
+        } catch (error) {
+            signupStatus.textContent = 'ERROR: 서버 연결 실패. 서버가 실행 중인지 확인하세요.';
+            signupStatus.style.color = '#ff4141';
         }
     }
 
+    function showVerificationStep(id) {
+        const loginBox = document.getElementById('login-box');
+        loginBox.innerHTML = `
+            <h1>Email Verification</h1>
+            <p>이메일로 인증 코드를 보냈습니다.</p>
+            <p>아래에 코드를 입력하세요:</p>
+            <input type="text" id="verify-code" placeholder="6자리 코드 입력">
+            <button id="verify-button">Verify</button>
+            <p id="verify-status"></p>
+        `;
+        document.getElementById('verify-button').addEventListener('click', () => handleVerification(id));
+    }
+
+    async function handleVerification(id) {
+        const code = document.getElementById('verify-code').value.trim();
+        const verifyStatus = document.getElementById('verify-status');
+
+        try {
+            const response = await fetch('http://localhost:3000/api/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, code })
+            });
+            const result = await response.json();
+
+            if (response.ok) {
+                verifyStatus.textContent = result.message;
+                verifyStatus.style.color = 'var(--neon-color)';
+                setTimeout(() => {
+                    const loginBox = document.getElementById('login-box');
+                    loginBox.innerHTML = originalLoginHTML;
+                    // 로그인 페이지로 돌아간 후 메시지 표시
+                    document.getElementById('login-status').textContent = '인증이 완료되었습니다. 로그인하세요.';
+                    document.getElementById('login-status').style.color = 'var(--neon-color)';
+                    document.getElementById('login-button').addEventListener('click', handleLogin);
+                    document.getElementById('login-id').addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') handleLogin();
+                    });
+                    document.getElementById('login-pw').addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') handleLogin();
+                    });
+                    document.getElementById('signup-link').addEventListener('click', showSignup);
+                }, 3000);
+            } else {
+                verifyStatus.textContent = `ERROR: ${result.error}`;
+                verifyStatus.style.color = '#ff4141';
+            }
+        } catch (error) {
+            verifyStatus.textContent = 'ERROR: 서버 연결 실패. 서버가 실행 중인지 확인하세요.';
+            verifyStatus.style.color = '#ff4141';
+        }
+    }
+
+    async function handleLogin() {
+        const loginIdInput = document.getElementById('login-id');
+        const loginPwInput = document.getElementById('login-pw');
+        const loginId = loginIdInput.value.trim();
+        const loginPw = loginPwInput.value.trim();
+        const loginStatus = document.getElementById('login-status');
+    
+        try {
+            const response = await fetch('http://localhost:3000/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: loginId, password: loginPw })
+            });
+            const result = await response.json();
+    
+            if (response.ok) {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('main-container').style.display = 'flex';
+                document.getElementById('user-id').textContent = `User ID: ${result.user.id}`;
+                trackUser(result.user.id);
+                document.getElementById('grade').value = result.user.grade;
+                initializeTerminal();
+            } else {
+                loginStatus.textContent = `ERROR: ${result.error}`;
+                loginStatus.style.color = '#ff4141';
+            }
+        } catch (error) {
+            loginStatus.textContent = 'ERROR: 서버 연결 실패. 서버가 실행 중인지 확인하세요.';
+            loginStatus.style.color = '#ff4141';
+        }
+    }
+    
     // 로그인한 사용자 추적 기능
     function trackUser(userId) {
         let trackedUsers = localStorage.getItem('trackedUsers');
@@ -119,14 +229,12 @@ function showSignup(e) {
             localStorage.setItem('trackedUsers', JSON.stringify(trackedUsers));
         }
     }
-
-    // 모든 접속 사용자 목록을 확인하려면 콘솔에 getTrackedUsers() 입력
+    
     function getTrackedUsers() {
         let trackedUsers = localStorage.getItem('trackedUsers');
         return trackedUsers ? JSON.parse(trackedUsers) : [];
     }
-
-    // 기존 초기화 로직을 함수로 묶음
+    
     function initializeTerminal() {
         const input = document.getElementById('input');
         const output = document.getElementById('output');
@@ -198,11 +306,10 @@ function showSignup(e) {
             }
         });
 
-        // 초기 터미널 메시지 출력
         appendOutput(`AMB Protocol v1.0 connected.`);
         appendOutput(`Welcome, ${document.getElementById('user-id').textContent}. Enter your spell protocol.`);
     }
 
-    // 페이지 로드 시 로그인 창 먼저 표시
     showLogin();
 });
+// 끝
