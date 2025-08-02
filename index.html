@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아르카나 네트워크 터미널</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <div class="info-panel">
+            <h1>AMB Protocol v1.0</h1>
+            <div class="grade-selector">
+                <label for="grade">현재 등급:</label>
+                <select id="grade">
+                    <option value="Citizen">Citizen</option>
+                    <option value="Technician">Technician</option>
+                    <option value="Medic">Medic</option>
+                    <option value="Architect">Architect</option>
+                    <option value="Root">Root</option>
+                </select>
+            </div>
+            <div class="entropy-debt">
+                <p>엔트로피 부채:</p>
+                <span id="entropy-value">0 J/K</span>
+                <div class="debt-bar-container">
+                    <div id="debt-bar" class="debt-bar"></div>
+                </div>
+            </div>
+            <p id="user-id">User ID: ARC-9214</p>
+        </div>
+
+        <div class="terminal-window">
+            <div id="output" class="output">
+                <p>> AMB Protocol v1.0 connected.</p>
+                <p>> Enter your spell protocol.</p>
+            </div>
+            <div class="input-line">
+                <span class="prompt">></span>
+                <input type="text" id="input" autofocus>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
