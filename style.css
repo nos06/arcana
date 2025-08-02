@@ -1,0 +1,96 @@
+body {
+    background-color: #0d1117;
+    color: #00ff41;
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.container {
+    display: flex;
+    width: 90%;
+    max-width: 1200px;
+    height: 80vh;
+    border: 2px solid #00ff41;
+    box-shadow: 0 0 20px #00ff41;
+    background-color: rgba(13, 17, 23, 0.8);
+}
+
+.info-panel {
+    width: 30%;
+    padding: 20px;
+    border-right: 2px solid #00ff41;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.terminal-window {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 1.5em;
+    text-shadow: 0 0 5px #00ff41;
+}
+
+.grade-selector select {
+    background-color: #0d1117;
+    color: #00ff41;
+    border: 1px solid #00ff41;
+    padding: 5px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.entropy-debt {
+    font-size: 0.9em;
+}
+
+.debt-bar-container {
+    width: 100%;
+    height: 10px;
+    background-color: #333;
+    border: 1px solid #00ff41;
+}
+
+.debt-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #ff4141;
+    transition: width 0.5s ease-in-out;
+}
+
+.output {
+    flex-grow: 1;
+    overflow-y: auto;
+    font-size: 0.9em;
+    white-space: pre-wrap;
+}
+
+.input-line {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.prompt {
+    margin-right: 5px;
+    font-size: 1em;
+}
+
+#input {
+    background-color: transparent;
+    border: none;
+    color: #00ff41;
+    font-family: 'Courier New', Courier, monospace;
+    width: 100%;
+    outline: none;
+}
