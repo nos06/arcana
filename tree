@@ -1,0 +1,499 @@
+import React, { useState } from 'react';
+import { Check, Lock } from 'lucide-react';
+
+const LifeSkillTree = () => {
+  const [theme, setTheme] = useState('yggdrasil');
+  const [selectedNode, setSelectedNode] = useState(null);
+
+  const [skills, setSkills] = useState({
+    // 어학 (완료)
+    toeic965: { name: 'TOEIC 965', completed: true, date: '', category: 'language', level: 3, prereq: null },
+    
+    // 무역/유통 (완료)
+    tradeEng1: { name: '무역영어 1급', completed: true, date: '', category: 'trade', level: 3, prereq: null },
+    tradeMaster2: { name: '국제무역사 2급', completed: true, date: '', category: 'trade', level: 2, prereq: null },
+    distribution2: { name: '유통관리사 2급', completed: true, date: '', category: 'trade', level: 2, prereq: null },
+    
+    // 추천: 무역/유통 심화
+    tradeMaster1: { name: '국제무역사 1급', completed: false, date: '', category: 'trade', level: 4, prereq: 'tradeMaster2', recommended: true },
+    logisticsMgr: { name: '물류관리사', completed: false, date: '', category: 'trade', level: 4, prereq: 'distribution2', recommended: true },
+    customsAgent: { name: '관세사', completed: false, date: '', category: 'trade', level: 5, prereq: 'logisticsMgr', recommended: true },
+    originMgr: { name: '원산지관리사', completed: false, date: '', category: 'trade', level: 4, prereq: 'tradeMaster1', recommended: true },
+    
+    // IT/사무 (일부 완료)
+    wordProcessor: { name: '워드프로세서', completed: true, date: '', category: 'it', level: 1, prereq: null },
+    infoProcTech: { name: '정보처리기능사', completed: true, date: '', category: 'it', level: 1, prereq: null },
+    infoProcEng: { name: '정보처리산업기사', completed: false, date: '', category: 'it', level: 2, prereq: 'infoProcTech' },
+    infoProcPro: { name: '정보처리기사', completed: false, date: '', category: 'it', level: 3, prereq: 'infoProcEng' },
+    
+    // 추천: IT 심화
+    sqld: { name: 'SQLD', completed: false, date: '', category: 'it', level: 2, prereq: 'wordProcessor', recommended: true },
+    adsp: { name: 'ADsP', completed: false, date: '', category: 'it', level: 3, prereq: 'sqld', recommended: true },
+    bigdata: { name: '빅데이터분석기사', completed: false, date: '', category: 'it', level: 4, prereq: 'adsp', recommended: true },
+    
+    // 통신 (완료)
+    landRadio: { name: '육상무선통신사', completed: true, date: '', category: 'communication', level: 2, prereq: null },
+    seaRadio: { name: '해상무선통신사', completed: true, date: '', category: 'communication', level: 2, prereq: null },
+    
+    // 안전/위험물 (일부 완료)
+    hazardTech: { name: '위험물기능사', completed: true, date: '', category: 'safety', level: 1, prereq: null },
+    hazardEng: { name: '위험물산업기사', completed: false, date: '', category: 'safety', level: 2, prereq: 'hazardTech' },
+    gasEng: { name: '가스기사', completed: false, date: '', category: 'safety', level: 3, prereq: 'hazardEng' },
+    
+    // 추천: 안전 심화
+    safetyMgr: { name: '산업안전기사', completed: false, date: '', category: 'safety', level: 3, prereq: 'hazardEng', recommended: true },
+    
+    // 사무 (완료)
+    secretary2: { name: '비서 2급', completed: true, date: '', category: 'office', level: 2, prereq: null },
+    
+    // 추천: 사무 심화
+    secretary1: { name: '비서 1급', completed: false, date: '', category: 'office', level: 3, prereq: 'secretary2', recommended: true },
+    humanResource: { name: '인적자원관리사', completed: false, date: '', category: 'office', level: 3, prereq: 'secretary2', recommended: true },
+  });
+
+  const [academic] = useState({ gpa: 3.2, maxGpa: 4.5 });
+
+  const categories = {
+    language: { name: '어학', color: '#3b82f6', gradient: 'from-blue-400 to-cyan-400', icon: '🌐' },
+    trade: { name: '무역/유통', color: '#8b5cf6', gradient: 'from-purple-400 to-pink-400', icon: '📦' },
+    it: { name: 'IT/정보', color: '#10b981', gradient: 'from-emerald-400 to-teal-400', icon: '💻' },
+    communication: { name: '통신', color: '#f59e0b', gradient: 'from-amber-400 to-orange-400', icon: '📡' },
+    safety: { name: '안전/위험물', color: '#ef4444', gradient: 'from-red-400 to-rose-400', icon: '⚠️' },
+    office: { name: '사무', color: '#ec4899', gradient: 'from-pink-400 to-fuchsia-400', icon: '📋' },
+  };
+
+  const themes = {
+    yggdrasil: { name: '세계수', bg: 'from-slate-950 via-slate-900 to-zinc-950' },
+    galaxy: { name: '은하수', bg: 'from-indigo-950 via-purple-950 to-pink-950' },
+    cyber: { name: '사이버', bg: 'from-black via-gray-950 to-zinc-950' },
+    nature: { name: '자연', bg: 'from-sky-950 via-blue-900 to-indigo-950' }
+  };
+
+  const currentTheme = themes[theme];
+
+  // 노드 위치 정의 (고정)
+  const nodePositions = {
+    // 중앙 뿌리
+    root: { x: '50%', y: '85%' },
+    
+    // 어학 (왼쪽 상단)
+    toeic965: { x: '15%', y: '15%' },
+    
+    // 무역/유통 (왼쪽)
+    tradeEng1: { x: '12%', y: '30%' },
+    tradeMaster2: { x: '8%', y: '42%' },
+    tradeMaster1: { x: '5%', y: '54%' },
+    distribution2: { x: '18%', y: '52%' },
+    logisticsMgr: { x: '15%', y: '64%' },
+    customsAgent: { x: '12%', y: '76%' },
+    originMgr: { x: '22%', y: '66%' },
+    
+    // IT/정보 (중앙 왼쪽)
+    wordProcessor: { x: '35%', y: '72%' },
+    sqld: { x: '32%', y: '60%' },
+    adsp: { x: '28%', y: '48%' },
+    bigdata: { x: '25%', y: '36%' },
+    infoProcTech: { x: '42%', y: '62%' },
+    infoProcEng: { x: '40%', y: '50%' },
+    infoProcPro: { x: '38%', y: '38%' },
+    
+    // 통신 (중앙 오른쪽)
+    landRadio: { x: '58%', y: '62%' },
+    seaRadio: { x: '60%', y: '50%' },
+    
+    // 안전/위험물 (오른쪽)
+    hazardTech: { x: '68%', y: '72%' },
+    hazardEng: { x: '72%', y: '60%' },
+    safetyMgr: { x: '78%', y: '52%' },
+    gasEng: { x: '75%', y: '44%' },
+    
+    // 사무 (오른쪽 상단)
+    secretary2: { x: '82%', y: '35%' },
+    secretary1: { x: '85%', y: '25%' },
+    humanResource: { x: '88%', y: '42%' },
+  };
+
+  const getCategoryStats = () => {
+    const stats = {};
+    Object.entries(categories).forEach(([key, cat]) => {
+      const catSkills = Object.values(skills).filter(s => s.category === key);
+      const completed = catSkills.filter(s => s.completed).length;
+      const total = catSkills.length;
+      stats[cat.name] = { completed, total, percentage: total > 0 ? (completed / total * 100) : 0 };
+    });
+    return stats;
+  };
+
+  const getTotalStats = () => {
+    const total = Object.keys(skills).length;
+    const completed = Object.values(skills).filter(s => s.completed).length;
+    const recommended = Object.values(skills).filter(s => s.recommended && !s.completed).length;
+    return { total, completed, recommended, percentage: (completed / total * 100).toFixed(1) };
+  };
+
+  const isUnlocked = (skillId) => {
+    const skill = skills[skillId];
+    if (!skill.prereq) return true;
+    return skills[skill.prereq].completed;
+  };
+
+  const toggleComplete = (skillId) => {
+    if (!isUnlocked(skillId)) return;
+    setSkills(prev => ({
+      ...prev,
+      [skillId]: { ...prev[skillId], completed: !prev[skillId].completed }
+    }));
+  };
+
+  const updateDate = (skillId, date) => {
+    setSkills(prev => ({
+      ...prev,
+      [skillId]: { ...prev[skillId], date }
+    }));
+  };
+
+  const Hexagon = ({ size = 60, children, className = '', style = {} }) => {
+    const points = Array.from({ length: 6 }, (_, i) => {
+      const angle = (Math.PI / 3) * i - Math.PI / 2;
+      const x = size / 2 + (size / 2) * Math.cos(angle);
+      const y = size / 2 + (size / 2) * Math.sin(angle);
+      return `${x},${y}`;
+    }).join(' ');
+
+    return (
+      <div className={`relative ${className}`} style={{ width: size, height: size, ...style }}>
+        <svg width={size} height={size} className="absolute inset-0">
+          <polygon points={points} className="transition-all duration-300" />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          {children}
+        </div>
+      </div>
+    );
+  };
+
+  const renderConnection = (fromId, toId) => {
+    const from = nodePositions[fromId];
+    const to = nodePositions[toId];
+    if (!from || !to) return null;
+
+    const skill = skills[toId];
+    const unlocked = isUnlocked(toId);
+    const category = categories[skill.category];
+
+    // 백분율을 픽셀로 변환 (부모 컨테이너 크기 기준)
+    const containerWidth = 1200; // 대략적인 컨테이너 너비
+    const containerHeight = 900;
+    
+    const x1 = parseFloat(from.x) * containerWidth / 100;
+    const y1 = parseFloat(from.y) * containerHeight / 100;
+    const x2 = parseFloat(to.x) * containerWidth / 100;
+    const y2 = parseFloat(to.y) * containerHeight / 100;
+
+    return (
+      <line
+        key={`${fromId}-${toId}`}
+        x1={x1}
+        y1={y1}
+        x2={x2}
+        y2={y2}
+        stroke={category.color}
+        strokeWidth="2"
+        strokeOpacity={unlocked ? 0.5 : 0.15}
+        strokeDasharray={unlocked ? "0" : "4,4"}
+        className="transition-all duration-300"
+      />
+    );
+  };
+
+  const renderSkillNode = (skillId) => {
+    const skill = skills[skillId];
+    const position = nodePositions[skillId];
+    if (!position) return null;
+
+    const unlocked = isUnlocked(skillId);
+    const category = categories[skill.category];
+
+    return (
+      <div
+        key={skillId}
+        className="absolute transform -translate-x-1/2 -translate-y-1/2"
+        style={{ left: position.x, top: position.y }}
+      >
+        <div 
+          className="cursor-pointer group"
+          onClick={() => unlocked && setSelectedNode(selectedNode === skillId ? null : skillId)}
+        >
+          <Hexagon size={70} className={`transition-all duration-300 ${unlocked ? 'group-hover:scale-110' : ''}`}>
+            <svg width="70" height="70" className="absolute inset-0">
+              <defs>
+                <filter id={`glow-${skillId}`}>
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              <polygon
+                points="35,8.66 60.62,23.33 60.62,52.67 35,67.34 9.38,52.67 9.38,23.33"
+                fill={skill.completed ? '#fbbf24' : unlocked ? category.color + '40' : '#1f2937'}
+                stroke={skill.completed ? '#fbbf24' : unlocked ? category.color : '#374151'}
+                strokeWidth={skill.completed ? "3" : skill.recommended ? "2.5" : "2"}
+                strokeDasharray={skill.recommended && !skill.completed ? "4,2" : "0"}
+                filter={skill.completed ? `url(#glow-${skillId})` : ''}
+                className="transition-all duration-300"
+              />
+            </svg>
+            
+            <div className="relative z-10 text-2xl">
+              {skill.completed ? '✨' : unlocked ? category.icon : <Lock size={20} className="text-gray-500" />}
+            </div>
+          </Hexagon>
+
+          {/* 추천 표시 */}
+          {skill.recommended && !skill.completed && unlocked && (
+            <div className="absolute -top-3 -right-3 w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center shadow-lg animate-pulse">
+              <span className="text-white text-xs font-bold">!</span>
+            </div>
+          )}
+
+          {/* 레벨 표시 */}
+          <div className={`absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg bg-gradient-to-br ${category.gradient}`}>
+            {skill.level}
+          </div>
+
+          {/* 이름 */}
+          <div className={`absolute top-20 left-1/2 transform -translate-x-1/2 text-white text-center text-xs font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg backdrop-blur-sm border ${
+            skill.recommended && !skill.completed ? 'bg-amber-900/70 border-amber-500/50' : 'bg-black/70 border-white/10'
+          }`}>
+            {skill.name}
+          </div>
+        </div>
+
+        {/* 상세 정보 패널 */}
+        {selectedNode === skillId && (
+          <div className="absolute top-24 left-1/2 transform -translate-x-1/2 bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-5 shadow-2xl z-50 w-72 border border-gray-700">
+            <div className="flex items-center gap-3 mb-3">
+              <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${category.gradient} flex items-center justify-center text-xl`}>
+                {category.icon}
+              </div>
+              <div>
+                <h3 className="font-bold text-lg text-white">{skill.name}</h3>
+                <div className="text-xs text-gray-400">{category.name} · Level {skill.level}</div>
+              </div>
+            </div>
+            
+            {skill.recommended && !skill.completed && (
+              <div className="mb-3 px-3 py-2 bg-amber-500/20 border border-amber-500/50 rounded-lg">
+                <div className="text-amber-300 text-xs font-semibold">💡 추천 자격증</div>
+                <div className="text-amber-200/80 text-xs mt-1">당신의 경력에 도움이 될 자격증입니다</div>
+              </div>
+            )}
+
+            <div className="border-t border-gray-700 pt-3 mb-3">
+              <label className="text-xs text-gray-400 block mb-1">취득일</label>
+              <input
+                type="date"
+                value={skill.date}
+                onChange={(e) => updateDate(skillId, e.target.value)}
+                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-gray-500"
+                disabled={!skill.completed}
+              />
+            </div>
+
+            {unlocked && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleComplete(skillId);
+                }}
+                className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-all ${
+                  skill.completed
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/30'
+                    : `bg-gradient-to-r ${category.gradient} text-white shadow-lg`
+                }`}
+              >
+                {skill.completed ? '✓ 취득완료' : '취득하기'}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const categoryStats = getCategoryStats();
+  const totalStats = getTotalStats();
+
+  return (
+    <div className={`min-h-screen bg-gradient-to-br ${currentTheme.bg} p-8 overflow-auto`}>
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-200 mb-2">
+            인생 스킬 트리
+          </h1>
+          <p className="text-gray-400 text-lg">뿌리부터 가지까지, 나의 성장 여정</p>
+        </div>
+
+        <div className="flex justify-center gap-3 mb-6">
+          {Object.entries(themes).map(([key, t]) => (
+            <button
+              key={key}
+              onClick={() => setTheme(key)}
+              className={`px-5 py-2.5 rounded-xl font-semibold transition-all ${
+                theme === key
+                  ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-gray-900 shadow-lg shadow-amber-500/30 scale-105'
+                  : 'bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm border border-white/10'
+              }`}
+            >
+              {t.name}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="space-y-6">
+            <div className="bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50 shadow-xl">
+              <h2 className="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">📊</div>
+                전체 진행률
+              </h2>
+              <div className="text-center mb-4">
+                <div className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-2">
+                  {totalStats.percentage}%
+                </div>
+                <div className="text-sm text-gray-400">{totalStats.completed} / {totalStats.total} 취득</div>
+                <div className="text-xs text-amber-400 mt-2">💡 추천 자격증 {totalStats.recommended}개</div>
+              </div>
+              <div className="w-full bg-gray-700/50 rounded-full h-3 overflow-hidden">
+                <div
+                  className="h-3 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-500 shadow-lg"
+                  style={{ width: `${totalStats.percentage}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50 shadow-xl">
+              <h2 className="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">📚</div>
+                학업
+              </h2>
+              <div className="text-center mb-3">
+                <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500">
+                  {academic.gpa}
+                </div>
+                <div className="text-sm text-gray-400 mt-1">/ {academic.maxGpa}</div>
+              </div>
+              <div className="w-full bg-gray-700/50 rounded-full h-3 overflow-hidden">
+                <div
+                  className="h-3 bg-gradient-to-r from-indigo-500 to-purple-500 transition-all shadow-lg"
+                  style={{ width: `${(academic.gpa / academic.maxGpa * 100)}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50 shadow-xl">
+              <h2 className="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">🎯</div>
+                분야별 역량
+              </h2>
+              <div className="space-y-4">
+                {Object.entries(categoryStats).map(([name, stat]) => {
+                  const cat = Object.values(categories).find(c => c.name === name);
+                  return (
+                    <div key={name}>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-white text-sm font-semibold flex items-center gap-2">
+                          <span className="text-lg">{cat.icon}</span>
+                          {name}
+                        </span>
+                        <span className="text-gray-400 text-sm font-mono">
+                          {stat.completed}/{stat.total}
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-700/50 rounded-full h-2.5 overflow-hidden">
+                        <div
+                          className={`h-2.5 bg-gradient-to-r ${cat.gradient} transition-all shadow-lg`}
+                          style={{ width: `${stat.percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-2">
+            <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/30 relative shadow-2xl" style={{ minHeight: '900px' }}>
+              {/* SVG 연결선 레이어 */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
+                {/* 무역 체인 */}
+                {renderConnection('tradeMaster2', 'tradeMaster1')}
+                {renderConnection('distribution2', 'logisticsMgr')}
+                {renderConnection('logisticsMgr', 'customsAgent')}
+                {renderConnection('tradeMaster1', 'originMgr')}
+                
+                {/* IT 체인 */}
+                {renderConnection('infoProcTech', 'infoProcEng')}
+                {renderConnection('infoProcEng', 'infoProcPro')}
+                {renderConnection('wordProcessor', 'sqld')}
+                {renderConnection('sqld', 'adsp')}
+                {renderConnection('adsp', 'bigdata')}
+                
+                {/* 안전 체인 */}
+                {renderConnection('hazardTech', 'hazardEng')}
+                {renderConnection('hazardEng', 'gasEng')}
+                {renderConnection('hazardEng', 'safetyMgr')}
+                
+                {/* 사무 체인 */}
+                {renderConnection('secretary2', 'secretary1')}
+                {renderConnection('secretary2', 'humanResource')}
+              </svg>
+
+              {/* 중앙 뿌리 */}
+              <div className="absolute left-1/2 bottom-12 transform -translate-x-1/2 z-10">
+                <Hexagon size={100}>
+                  <svg width="100" height="100" className="absolute inset-0">
+                    <defs>
+                      <filter id="root-glow">
+                        <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                        <feMerge>
+                          <feMergeNode in="coloredBlur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
+                    </defs>
+                    <polygon
+                      points="50,12.4 87.32,33.3 87.32,75.3 50,96.2 12.68,75.3 12.68,33.3"
+                      fill="#fbbf24"
+                      stroke="#fbbf24"
+                      strokeWidth="4"
+                      filter="url(#root-glow)"
+                    />
+                  </svg>
+                  <div className="relative z-10 text-center">
+                    <div className="text-4xl mb-1">🌱</div>
+                    <div className="text-white font-bold text-sm">인생</div>
+                  </div>
+                </Hexagon>
+              </div>
+
+              {/* 모든 스킬 노드 */}
+              {Object.keys(skills).map(skillId => renderSkillNode(skillId))}
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center text-gray-500 text-sm mt-8 space-y-1">
+          <p>💡 노드를 클릭하여 상세정보 확인 및 취득 상태를 변경하세요</p>
+          <p>🔒 이전 단계를 완료해야 다음 자격증이 잠금 해제됩니다</p>
+          <p className="text-amber-400">⚡ 점선 테두리와 느낌표는 추천 자격증입니다</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LifeSkillTree;
